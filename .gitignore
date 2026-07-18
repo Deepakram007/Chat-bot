@@ -4,3 +4,19 @@ __pycache__/
 .env
 data/chroma_db/
 .pytest_cache/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

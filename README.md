@@ -3,7 +3,7 @@
 A retrieval-augmented chatbot: it answers questions grounded in a set of
 documents you provide, rather than relying purely on the LLM's training
 data. Built with FastAPI, Chroma (vector store), sentence-transformers
-(embeddings), and the Anthropic API (generation).
+(embeddings), and the NVIDIA NIM API (generation).
 
 ## Architecture
 
@@ -20,7 +20,7 @@ Vector search over Chroma  ──►  top-k relevant chunks
 Build prompt: question + retrieved context
      │
      ▼
-Claude API generates grounded answer
+NVIDIA NIM API generates grounded answer (e.g. Llama 3)
      │
      ▼
 Response + source citations
@@ -34,7 +34,7 @@ source venv/bin/activate        # Windows: venv\Scripts\activate
 
 pip install -r requirements.txt
 
-cp .env.example .env            # then add your ANTHROPIC_API_KEY
+cp .env.example .env            # then add your NVIDIA_API_KEY
 ```
 
 ## Run the backend
@@ -61,6 +61,8 @@ curl -X POST http://localhost:8000/ingest/text \
   -d '{"source": "policy.txt", "content": "Refunds are accepted within 30 days of purchase."}'
 ```
 
+*Note: If you use a duplicate source name, it automatically appends a timestamp (e.g., `policy.txt_2026-07-18_11-22-30`) to keep all uploads distinct without deleting historical data.*
+
 Or upload a `.txt` file:
 
 ```bash
@@ -85,7 +87,7 @@ app/
     config.py          Settings, loaded from .env
     chunking.py         Text splitting
     vectorstore.py       Chroma embed/store/query logic
-    llm.py              Claude API call + prompt construction
+    llm.py              NVIDIA API call + prompt construction
   routers/
     ingest.py           /ingest endpoints
     chat.py             /chat endpoint
@@ -100,7 +102,7 @@ tests/
 - **PDF/docx ingestion** — add `pypdf` / `python-docx` loaders in `ingest.py`
 - **Reranking** — add a cross-encoder rerank step after initial retrieval for
   better precision
-- **Streaming responses** — use Claude's streaming API + FastAPI
+- **Streaming responses** — use standard OpenAI streaming options + FastAPI
   `StreamingResponse` for a more production-feel UX
 - **Evaluation** — fill in `eval_cases` in `tests/test_pipeline.py` with real
   question/answer pairs from your knowledge base to measure retrieval and
@@ -114,6 +116,7 @@ tests/
 
 - Embeddings run locally via `sentence-transformers` (`all-MiniLM-L6-v2`),
   so ingestion doesn't cost API calls. Only the generation step
-  (`app/core/llm.py`) hits the Claude API.
+  (`app/core/llm.py`) hits the NVIDIA NIM API.
 - Chroma persists to disk at `data/chroma_db` by default, so your knowledge
   base survives restarts.
+- Multiple uploads of the same source are versioned with local timestamps, allowing you to ingest newer versions of files without losing past contexts.

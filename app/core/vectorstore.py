@@ -6,6 +6,7 @@ happening at each step -- swap in LangChain/LlamaIndex later once you
 understand this.
 """
 
+import datetime
 import uuid
 from typing import List, Dict
 
@@ -29,9 +30,16 @@ def add_documents(chunks: List[str], source: str) -> int:
     if not chunks:
         return 0
 
+    # Generate a timestamp and append it to the source name to keep repeated uploads unique
+    timestamp_str = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    unique_source = f"{source}_{timestamp_str}"
+
     ids = [str(uuid.uuid4()) for _ in chunks]
     embeddings = embed(chunks)
-    metadatas = [{"source": source, "chunk_index": i} for i in range(len(chunks))]
+    metadatas = [
+        {"source": unique_source, "chunk_index": i, "timestamp": timestamp_str}
+        for i in range(len(chunks))
+    ]
 
     _collection.add(
         ids=ids,

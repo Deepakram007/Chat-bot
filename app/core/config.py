@@ -9,8 +9,11 @@ load_dotenv()
 
 
 class Settings:
-    ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
-    CLAUDE_MODEL: str = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+
+    NVIDIA_API_KEY: str = os.getenv("NVIDIA_API_KEY", "")
+    NVIDIA_MODEL: str = os.getenv("NVIDIA_MODEL", "meta/llama-3.1-70b-instruct")
 
     # Where Chroma persists its vector store on disk
     CHROMA_PERSIST_DIR: str = os.getenv("CHROMA_PERSIST_DIR", "data/chroma_db")
@@ -29,8 +32,8 @@ class Settings:
 
 settings = Settings()
 
-if not settings.ANTHROPIC_API_KEY:
+if not settings.NVIDIA_API_KEY:
     print(
-        "[WARNING] ANTHROPIC_API_KEY is not set. "
-        "Create a .env file (see .env.example) before calling /chat."
+        "[WARNING] NVIDIA_API_KEY is not set. "
+        "Create a .env file (see .env.example) and add your NVIDIA API Key before calling /chat."
     )
